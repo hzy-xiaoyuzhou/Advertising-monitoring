@@ -1,6 +1,8 @@
 在此之前需要搭建好python的集成开发环境，并安装requests、re库
 （推荐使用PyCharm和Anaconda）
 
+代码：
+
 import requests    #导入requests库
 import re          #导入re库
 

@@ -1,0 +1,27 @@
+在此之前需要搭建好python的集成开发环境，并安装requests、re库
+（推荐使用PyCharm和Anaconda）
+
+import requests    #导入requests库
+import re          #导入re库
+
+#用来抓取页面完整数据
+def get_one_page(url):
+    response=requests.get(url)
+    if response.status_code==200:
+        return response.text
+    return None
+
+#用正则表达式抓取页面某一位置的数据
+def parse_one_page(html):
+    pattern=re.compile('<div class="leftpad10 contact">.*?tdr.*?>.*?href="(.*?)".*?></div>',re.S)
+    item=re.findall(pattern,html)
+    print(item)
+
+#main方法
+def main():
+    url='http://yyk.99.com.cn/haidian/105061/jianjie.html'
+    html=get_one_page(url)
+    parse_one_page(html)
+
+if __name__=='__main__':
+    main()

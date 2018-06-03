@@ -1,0 +1,45 @@
+import requests    #导入requests库
+import re          #导入re库
+from bs4 import BeautifulSoup
+from multiprocessing import Pool
+
+#用来抓取页面完整数据
+def get_one_page(url):
+    response=requests.get(url)
+    if response.status_code==200:
+        return response.text
+    return None
+
+#用正则表达式抓取页面某一位置的数据
+def parse_one_page(html):
+    pattern=re.compile('<div class="leftpad10 contact">.*?tdr.*?>.*?href="(.*?)".*?></div>',re.S)
+    item=re.findall(pattern,html)
+    return item
+
+def get_all_page(html):
+    soup=BeautifulSoup(html,'html.parser')
+    data=soup.select('.tablist li')
+    for link in data:
+        if(len(link.select('span'))>0):
+            type = link.select('img')
+            if (str(type) == '[<img alt="民营医院" border="0" src="/Theme/v2010/yyk/images/minying.gif"/>]'):
+                name = link.select('span')[0].text
+                demo=link.select('a')[0]['href']
+                a = parse_one_page(get_one_page(demo+'jianjie.html'))
+                if(a == demo):
+                    web='None'
+                else:
+                    web=a
+                print(name,web)
+                with open('huanan.txt','a',encoding='utf-8') as f:
+                    f.write(name+':   '+str(web)+'\n')
+                    f.close()
+
+#main方法
+def main(url):
+    html=get_one_page(url)
+    get_all_page(html)
+if __name__=='__main__':
+    huanan=['http://yyk.99.com.cn/guangdong/','http://yyk.99.com.cn/guangxi/','http://yyk.99.com.cn/hainan/']
+    pool=Pool()
+    pool.map(main,[i for i in  huanan])
